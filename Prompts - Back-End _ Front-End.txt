@@ -1,0 +1,67 @@
+﻿0. Contexto base
+Claude · 0.1 Contexto do projeto (cole no início de uma conversa nova)
+Estou em um hackathon de tratamento de dados e API. Preciso processar um CSV de notas fiscais (cerca de 100 mil registros, dentro de um ZIP), validar regras de negócio e expor os resultados (aprovadas, reprovadas, inválidas e duplicadas) via API para um front-end. Stack: Python 3, pandas, Pydantic, SQLAlchemy, FastAPI e Uvicorn. Arquitetura: o Pydantic lê, converte e valida linha a linha, informando o motivo exato de cada erro; a deduplicação acontece na camada de aplicação, antes da gravação; o SQLAlchemy persiste só as notas válidas; as demais ficam em um relatório consumido pelo front. Responda em português, com código pronto para copiar e colar e explicando como testar.
+1. Leitura e estrutura do projeto
+Claude · 1.1 Separar as linhas em notas
+Tenho este código que lê o CSV do ZIP com pandas: [colar código]. Como transformo cada linha em um dicionário de “nota bruta”, guardando o número da linha original, para validar depois? Leia tudo como texto, para não perder zeros à esquerda nem mascarar campos vazios.
+Claude · 1.2 Organização em arquivos
+Devo manter leitura, modelo, validação e execução no mesmo arquivo ou separar em módulos? Proponha a estrutura de arquivos para o VS Code, mostre o código de cada um e explique como executar.
+Claude · 1.3 Entender um trecho de código
+Explique, parte por parte e com um exemplo de entrada e saída, o que faz esta linha: {"linha_csv": i + 2, **registro}.
+2. Modelo, integração e testes
+Claude · 2.1 Modelo de dados
+Escreva o modelo Pydantic da nota fiscal usando as colunas reais do meu CSV (abra o ZIP anexo para conferir nomes e formatos). Converta valores com vírgula decimal e datas DD/MM/AAAA, e devolva mensagens de erro claras por campo.
+Claude · 2.2 Integração entre módulos
+Os arquivos main, leitura, modelos e validação se conectam entre si? Mostre o fluxo de dados entre eles e as condições para funcionar (nomes de arquivo, pasta, versões).
+Claude · 2.3 O que falta
+Já criei main.py, leitura.py, modelos.py e validacao.py. O que ainda falta para entregar o back-end completo?
+Claude · 2.4 Execução e teste
+Explique o que o main.py faz e como testá-lo: uma execução normal e um teste com linhas inválidas e duplicadas inseridas à mão, informando o resultado esperado de cada uma.
+3. Regras de negócio e validadores
+Claude · 3.1 Interpretar o JSON
+Anexei o JSON com os validadores do fundo. Interprete as regras, meça quantas notas do CSV cada uma afeta e diga quais são regras de linha, quais precisam de dado externo e quais dependem do total da carteira.
+Claude · 3.2 Implementar as regras
+Reescreva o modelo e crie um módulo de regras que leia o JSON e execute apenas os validadores ativos, devolvendo o código e a mensagem de cada reprovação. Deixe pendente o que depende de dado externo, liste as suposições que adotou e me envie os arquivos completos.
+Manus · 3.3 Alterar um validador existente
+No Antecipe, atualize o validador [código do validador]. Use os valores abaixo: [descreva os novos valores]. Não altere outros validadores. Confirme que a configuração foi salva e explique como testar nas próximas análises.
+Manus · 3.4 Ativar ou desativar uma regra
+No arquivo validadores_antecipe.json, deixe [código do validador] como [ativo/inativo]. Preserve os demais campos e validadores. Valide o JSON antes de finalizar.
+Manus · 3.5 Criar um novo validador
+Analise a estrutura atual de regras.py e validadores_antecipe.json. Implemente o validador [nome e comportamento da regra] de ponta a ponta: backend, configuração editável e testes. Não fixe os parâmetros no código; leia-os do JSON. Informe claramente se alguma parte não puder ser implementada.
+4. Duplicidade
+Claude · 4.1 Investigar as duplicadas
+O relatório mostra 0 duplicadas. O CSV já foi limpo? Investigue com os dados reais (inclusive variações de formatação, zeros à esquerda e parcelas) e me mostre as evidências.
+Claude · 4.2 Definir o critério
+Existem números de documento repetidos no CSV e quero que apareçam como duplicados. Defina o critério de duplicidade (só o documento, cedente + documento, ou a nota completa), deixe-o configurável e explique o impacto nas contagens.
+5. Banco e API
+Claude · 5.1 Banco de dados
+Crie o banco com SQLAlchemy (SQLite) para gravar somente as notas aprovadas, com valor como Numeric, gravação em lotes e uma função de listagem paginada. Explique como instalar, integrar ao main e conferir se gravou.
+Claude · 5.2 API
+Crie a API FastAPI que processa tudo uma vez na inicialização e expõe resumo, notas aprovadas, reprovadas, inválidas e duplicadas, com paginação, filtro por código de regra e CORS.
+Claude · 5.3 Dúvida pontual
+O que é a pasta __pycache__, posso apagá-la e como evito subi-la para o Git?
+6. Análise de arquivos
+Manus · 6.1 Analisar um CSV
+Analise o arquivo CSV enviado com a configuração atual do Antecipe. Processe todas as linhas, sem filtrar por fundo. Informe quantas foram lidas, aprovadas, reprovadas, inválidas e duplicadas. Não descarte linhas silenciosamente e apresente os motivos das reprovações.
+Manus · 6.2 Consultar análises anteriores
+Abra o histórico do Antecipe e localize a análise [nome do arquivo ou data aproximada]. Mostre o resumo e explique como reabrir seus resultados na interface.
+7. Diagnóstico e validação
+Claude · 7.1 Depuração de erro
+Ao rodar o main.py recebi este erro: [colar o traceback ou o print]. Explique a causa e como corrigir.
+Manus · 7.2 Diagnosticar um erro ao iniciar no Windows
+Estou tentando iniciar o Antecipe no Windows. A mensagem exibida no CMD é: [cole o erro completo]. Ajude-me passo a passo, começando por verificar a pasta atual e os arquivos necessários. Não presuma caminhos que eu não confirmei.
+Manus · 7.3 Validar uma alteração
+Verifique a alteração feita no Antecipe. Confirme que o JSON continua válido, que todos os registros do CSV recebem resultado e que os testes de interface e backend passam. Informe os totais e qualquer limitação encontrada.
+8. Documentação e front-end
+Claude · 8.1 Doc a partir de uma resposta
+Crie um Claude Doc a partir da sua última resposta.
+Claude · 8.2 Contexto para o time de front
+Escreva um documento de contexto do back-end para o time de front-end: dados, grupos de classificação, códigos de motivo, endpoints, formatos de resposta e pontos em aberto.
+Claude · 8.3 Resumo do progresso
+Resuma tudo o que já foi feito no projeto e o que ainda falta conferir.
+Claude · 8.4 Revisão geral (pendente)
+Revise todos os arquivos que enviei e corrija o que estiver errado. Faça as duplicadas aparecerem, prepare a API para que, ao clicar em uma nota no front, apareça por que ela foi aprovada ou reprovada, escreva um prompt para gerar um front-end compatível com esta API e entregue todos os arquivos finais prontos para copiar e colar.
+Observações sobre os prompts do Manus
+* Os prompts 6.2, 7.2 e 7.3 falam de histórico de análises, interface e testes de interface. O código que montamos aqui ainda não tem nada disso: ele é só back-end, com main.py e API. Esses prompts só funcionam em uma versão do Antecipe que tenha essas partes.
+* Os prompts 3.3 a 3.5 combinam com o que fizemos, já que o regras.py lê os parâmetros do JSON e só roda os validadores ativos.
+* O prompt 6.1 (“sem filtrar por fundo”) corresponde à opção SOMENTE_FUNDO_DO_JSON = False da api.py.
